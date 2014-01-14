@@ -1,12 +1,12 @@
 /*
- * Copyright Bruce Liang (ldcsaa@gmail.com)
+ * Copyright: JessMA Open Source (ldcsaa@gmail.com)
  *
- * Version	: 2.3.2
+ * Version	: 2.3.3
  * Author	: Bruce Liang
  * Website	: http://www.jessma.org
  * Project	: https://github.com/ldcsaa
  * Blog		: http://www.cnblogs.com/ldcsaa
- * WeiBo	: http://weibo.com/u/1402935851
+ * Wiki		: http://www.oschina.net/p/hp-socket
  * QQ Group	: 75375912
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -36,7 +36,7 @@ DWORD TimeGetTime();
 **********************************/
 DWORD GetTimeGap32(DWORD dwOriginal);
 
-#if _WIN32_WINNT >= 0x0600
+#if _WIN32_WINNT >= _WIN32_WINNT_WS08
 /**********************************
 描述: 获取当前时间与原始时间的时间差
 参数: 

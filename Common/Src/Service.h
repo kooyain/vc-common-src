@@ -22,5 +22,20 @@
  * limitations under the License.
  */
  
-#include "stdafx.h"
-#include "FileMapping.h"
+#pragma once
+
+#ifndef _WIN32_WINNT		// 允许使用特定于 Windows NT 4 或更高版本的功能。
+#define _WIN32_WINNT 0x0500	// 将此更改为针对于 Windows 2000 或更高版本的合适的值。
+#endif						
+
+#ifdef _AFX
+	#include <winsvc.h>
+#endif
+
+BOOL IsServiceExist(LPCTSTR pszServiceName);
+
+BOOL GetServiceStatus(LPCTSTR pszServiceName, DWORD* pStatus);
+
+BOOL GetServiceImagePath(LPCTSTR pszServiceName, CString& strImagePath);
+
+BOOL UnInstallService(LPCTSTR pszServiceName, LPCTSTR pszParam, DWORD dwWaitTime = INFINITE);
