@@ -23,9 +23,9 @@
  */
  
 /******************************************************************************
-Module:  BufferPtr.cpp
-Notices: Copyright (c) 2006 Bruce Liang
-Purpose: 用于简化堆内存的申请和释放.
+Module:  BufferPool.cpp
+Notices: Copyright (c) 2013 Bruce Liang
+Purpose: 简单内存缓冲池
 Desc:
 ******************************************************************************/
 
@@ -40,7 +40,7 @@ const DWORD CItemPool::DEFAULT_POOL_HOLD			= 900;
 const DWORD CBufferPool::DEFAULT_ITEM_CAPACITY		= CItemPool::DEFAULT_ITEM_CAPACITY;
 const DWORD CBufferPool::DEFAULT_ITEM_POOL_SIZE		= CItemPool::DEFAULT_POOL_SIZE;
 const DWORD CBufferPool::DEFAULT_ITEM_POOL_HOLD		= CItemPool::DEFAULT_POOL_HOLD;
-const DWORD CBufferPool::DEFAULT_BUFFER_LOCK_TIME	= 3000;
+const DWORD CBufferPool::DEFAULT_BUFFER_LOCK_TIME	= 5000;
 const DWORD CBufferPool::DEFAULT_BUFFER_POOL_SIZE	= 150;
 const DWORD CBufferPool::DEFAULT_BUFFER_POOL_HOLD	= 450;
 
