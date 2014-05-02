@@ -1,7 +1,7 @@
 /*
  * Copyright: JessMA Open Source (ldcsaa@gmail.com)
  *
- * Version	: 2.3.3
+ * Version	: 2.3.4
  * Author	: Bruce Liang
  * Website	: http://www.jessma.org
  * Project	: https://github.com/ldcsaa
@@ -36,13 +36,13 @@ Desc:
 const DWORD TItem::DEFAULT_ITEM_CAPACITY			= 4096 - sizeof(TItem);
 const DWORD CItemPool::DEFAULT_ITEM_CAPACITY		= TItem::DEFAULT_ITEM_CAPACITY;
 const DWORD CItemPool::DEFAULT_POOL_SIZE			= 300;
-const DWORD CItemPool::DEFAULT_POOL_HOLD			= 600;
+const DWORD CItemPool::DEFAULT_POOL_HOLD			= 900;
 const DWORD CBufferPool::DEFAULT_ITEM_CAPACITY		= CItemPool::DEFAULT_ITEM_CAPACITY;
 const DWORD CBufferPool::DEFAULT_ITEM_POOL_SIZE		= CItemPool::DEFAULT_POOL_SIZE;
 const DWORD CBufferPool::DEFAULT_ITEM_POOL_HOLD		= CItemPool::DEFAULT_POOL_HOLD;
 const DWORD CBufferPool::DEFAULT_BUFFER_LOCK_TIME	= 3000;
-const DWORD CBufferPool::DEFAULT_BUFFER_POOL_SIZE	= 100;
-const DWORD CBufferPool::DEFAULT_BUFFER_POOL_HOLD	= 300;
+const DWORD CBufferPool::DEFAULT_BUFFER_POOL_SIZE	= 150;
+const DWORD CBufferPool::DEFAULT_BUFFER_POOL_HOLD	= 450;
 
 TItem* TItem::Construct(CPrivateHeap& heap, int capacity, BYTE* pData, int length)
 {
@@ -117,33 +117,41 @@ inline void	TItem::Reset(int first, int last)
 	if(last >= 0)	end		= head + min(last, capacity);
 }
 
-void TItemList::Cat(const BYTE* pData, int length)
+int TItemList::Cat(const BYTE* pData, int length)
 {
-	while(length > 0)
+	int remain = length;
+
+	while(remain > 0)
 	{
 		TItem* pItem = Back();
 
 		if(pItem == nullptr || pItem->IsFull())
 			pItem = PushBack(itPool.PickFreeItem());
 
-		int cat  = pItem->Cat(pData, length);
+		int cat  = pItem->Cat(pData, remain);
 
 		pData	+= cat;
-		length	-= cat;
+		remain	-= cat;
 	}
+
+	return length;
 }
 
-void TItemList::Cat(const TItem* pItem)
+int TItemList::Cat(const TItem* pItem)
 {
-	Cat(pItem->Ptr(), pItem->Size());
+	return Cat(pItem->Ptr(), pItem->Size());
 }
 
-void TItemList::Cat(const TItemList& other)
+int TItemList::Cat(const TItemList& other)
 {
 	ASSERT(this != &other);
 
+	int length = 0;
+
 	for(TItem* pItem = other.Front(); pItem != nullptr; pItem = pItem->next)
-		Cat(pItem);
+		length += Cat(pItem);
+
+	return length;
 }
 
 int TItemList::Fetch(BYTE* pData, int length)
@@ -181,30 +189,50 @@ int TItemList::Reduce(int length)
 	return length - remain;
 }
 
+void TItemList::Release()
+{
+	itPool.PutFreeItem(*this);
+}
+
 void CItemPool::PutFreeItem(TItem* pItem)
 {
 	ASSERT(pItem != nullptr);
 
+	DWORD size = m_lsFreeItem.Size();
+
+	if(size < m_dwPoolHold)
 	{
 		CCriSecLock locallock(m_csFreeItem);
 		m_lsFreeItem.PushBack(pItem);
 	}
-
-	if((DWORD)m_lsFreeItem.Size() > m_dwPoolHold)
+	else
+	{
+		TItem::Destruct(pItem);
 		CompressFreeItem(m_dwPoolSize);
+	}
 }
 
 void CItemPool::PutFreeItem(TItemList& lsItem)
 {
-	if(lsItem.Size() > 0)
+	DWORD addSize = lsItem.Size();
+
+	if(addSize > 0)
 	{
+		DWORD cacheSize = m_lsFreeItem.Size();
+		DWORD totalSize = addSize + cacheSize;
+
+		if(totalSize <= m_dwPoolHold)
 		{
 			CCriSecLock locallock(m_csFreeItem);
 			m_lsFreeItem.Shift(lsItem);
 		}
+		else
+		{
+			lsItem.Clear();
 
-		if((DWORD)m_lsFreeItem.Size() > m_dwPoolHold)
-			CompressFreeItem(m_dwPoolSize);
+			if(cacheSize >= m_dwPoolHold)
+				CompressFreeItem(m_dwPoolSize);
+		}
 	}
 }
 
@@ -230,7 +258,11 @@ TItem* CItemPool::PickFreeItem()
 
 inline void CItemPool::Clear()
 {
-	m_lsFreeItem.Clear();
+	{
+		CCriSecLock locallock(m_csFreeItem);
+		m_lsFreeItem.Clear();
+	}
+
 	m_heap.Reset();
 }
 
@@ -337,14 +369,14 @@ void CBufferPool::PutFreeBuffer(TBuffer* pBuffer)
 			if(pBuffer->IsValid())
 			{
 				pBuffer->Reset();
-				m_itPool.PutFreeItem(pBuffer->items);
-
 				bOK = TRUE;
 			}
 		}
 
 		if(bOK)
 		{
+			m_itPool.PutFreeItem(pBuffer->items);
+			
 			{
 				CCriSecLock locallock(m_csFreeBuffer);
 				m_lsFreeBuffer.PushBack(pBuffer);
@@ -429,11 +461,19 @@ TBuffer* CBufferPool::FindCacheBuffer(ULONG_PTR dwID)
 
 void CBufferPool::Clear()
 {
-	for(TBufferPtrMapCI it = m_mpBuffer.begin(); it != m_mpBuffer.end(); ++it)
-		TBuffer::Destruct(it->second);
+	{
+		CReentrantWriteLock locallock(m_csBufferMap);
 
-	m_mpBuffer.clear();
-	m_lsFreeBuffer.Clear();
+		for(TBufferPtrMapCI it = m_mpBuffer.begin(); it != m_mpBuffer.end(); ++it)
+			TBuffer::Destruct(it->second);
+
+		m_mpBuffer.clear();
+	}
+
+	{
+		CCriSecLock locallock(m_csFreeBuffer);
+		m_lsFreeBuffer.Clear();
+	}
 
 	m_itPool.Clear();
 	m_heap.Reset();
