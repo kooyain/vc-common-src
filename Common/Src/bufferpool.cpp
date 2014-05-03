@@ -30,10 +30,11 @@ Desc:
 ******************************************************************************/
 
 #include "stdafx.h"
-#include "WaitFor.h"
 #include "bufferpool.h"
+#include "SysHelper.h"
+#include "WaitFor.h"
 
-const DWORD TItem::DEFAULT_ITEM_CAPACITY			= 4096 - sizeof(TItem);
+const DWORD TItem::DEFAULT_ITEM_CAPACITY			= ::SysGetPageSize();
 const DWORD CItemPool::DEFAULT_ITEM_CAPACITY		= TItem::DEFAULT_ITEM_CAPACITY;
 const DWORD CItemPool::DEFAULT_POOL_SIZE			= 300;
 const DWORD CItemPool::DEFAULT_POOL_HOLD			= 900;
