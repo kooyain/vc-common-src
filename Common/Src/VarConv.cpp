@@ -1,7 +1,7 @@
 /*
  * Copyright: JessMA Open Source (ldcsaa@gmail.com)
  *
- * Version	: 2.3.5
+ * Version	: 2.3.7
  * Author	: Bruce Liang
  * Website	: http://www.jessma.org
  * Project	: https://github.com/ldcsaa
@@ -21,16 +21,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
-/******************************************************************************
-Module:  VarConv.cpp
-Notices: Copyright (c) 2006 Bruce Liang
-Purpose: 定义 Variant 数据类型与普通数据类型的转换.
-Desc:
-Usage:
-Rule:	
-Example:								
-******************************************************************************/
 
 #include "stdafx.h"
 #include "VarConv.h"

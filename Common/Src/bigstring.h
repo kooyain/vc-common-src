@@ -1,7 +1,7 @@
 /*
  * Copyright: JessMA Open Source (ldcsaa@gmail.com)
  *
- * Version	: 2.3.5
+ * Version	: 2.3.7
  * Author	: Bruce Liang
  * Website	: http://www.jessma.org
  * Project	: https://github.com/ldcsaa
@@ -21,13 +21,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
-/******************************************************************************
-Module:  BigString.h
-Notices: Copyright (c) 2006 Bruce Liang
-Purpose: 管理大字符串, 提高内存申请/释放的效率.
-Desc:
-******************************************************************************/
 
 #pragma once
 

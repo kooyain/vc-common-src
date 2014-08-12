@@ -1,7 +1,7 @@
 /*
  * Copyright: JessMA Open Source (ldcsaa@gmail.com)
  *
- * Version	: 2.3.5
+ * Version	: 2.3.7
  * Author	: Bruce Liang
  * Website	: http://www.jessma.org
  * Project	: https://github.com/ldcsaa
@@ -21,27 +21,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
-/******************************************************************************
-
-Module:  AdoObjectPool.h
-Notices: Copyright (c) 2006 Bruce Liang
-Purpose: 封装多线程的 ADO 数据库连接.
-Desc:
-		 1. CAdoObject 封装一个数据库连接
-		 2. CAdoObjectPool 封装数据库连接池
-
-Usage:
-		 1. 通常应用程序只使用 CAdoObjectPool 对象, 不必处理 CAdoObject 对象
-		 2. 使用方法: 在数据库访问函数中定义一个 CAdoObjectPool 局部对象, 然后
-			调用该对象的相应方法
-			(见: TestDBAccessor测试程序对 DBAccessor 对象的使用)
-
-Rule:	1.	见: "DBAccessor.h" 的头部注释
-
-Example:	见: TestDBAccessor测试程序
-											
-******************************************************************************/
 
 #pragma once
 
