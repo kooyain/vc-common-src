@@ -1,7 +1,7 @@
 /*
  * Copyright: JessMA Open Source (ldcsaa@gmail.com)
  *
- * Version	: 2.3.7
+ * Version	: 2.3.8
  * Author	: Bruce Liang
  * Website	: http://www.jessma.org
  * Project	: https://github.com/ldcsaa
@@ -13,7 +13,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,12 +27,12 @@
 #include <process.h>
 #include "CriticalSection.h"
 
-class CThread
+template<class T = void> class CThread
 {
 public:
-	virtual UINT Run(LPVOID lpParam)  = 0;
+	virtual UINT Run(T* lpParam)  = 0;
 
-	BOOL Start(LPVOID lpParam = nullptr, int iPriority = THREAD_PRIORITY_NORMAL, UINT uiStackSize = 0, LPSECURITY_ATTRIBUTES lpThreadAttributes = nullptr)
+	BOOL Start(T* lpParam = nullptr, int iPriority = THREAD_PRIORITY_NORMAL, UINT uiStackSize = 0, LPSECURITY_ATTRIBUTES lpThreadAttributes = nullptr)
 	{
 		BOOL isOK = TRUE;
 
@@ -143,6 +143,6 @@ private:
 
 private:
 	HANDLE	m_hThread;
-	LPVOID	m_lpParam;
+	T*		m_lpParam;
 	int		m_iPriority;
 };
