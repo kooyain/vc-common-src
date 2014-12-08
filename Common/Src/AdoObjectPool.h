@@ -1,7 +1,7 @@
 /*
  * Copyright: JessMA Open Source (ldcsaa@gmail.com)
  *
- * Version	: 2.3.7
+ * Version	: 2.3.8
  * Author	: Bruce Liang
  * Website	: http://www.jessma.org
  * Project	: https://github.com/ldcsaa
@@ -24,9 +24,9 @@
 
 #pragma once
 
-#import <msado15.dll> no_namespace rename ("EOF", "adoEOF") rename("BOF","adoBOF")
+#import <Msado15.dll> no_namespace rename ("EOF", "adoEOF") rename("BOF","adoBOF")
 
-
+#include <atltime.h>
 #include <icrsint.h>
 #include <vector>
 
@@ -212,7 +212,7 @@ public:
 	, m_pCommand	(_T("ADODB.Command"))
 	, m_bstrDSN		(dsn)
 	, m_lReference	(0)
-	, m_evtAdo		(NULL, FALSE, TRUE)
+	, m_evtAdo		(FALSE, TRUE)
 	{
 	}
 
@@ -306,7 +306,7 @@ public:
 		CLocalLock<CCriSec> local(sm_csAdo);
 
 		WaitAllAdoObjectFree();
-		ClearPtrArray(sm_vtAdo);
+		ClearPtrSet(sm_vtAdo);
 
 		if(sm_pevtAdo)
 		{
